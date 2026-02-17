@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EVER4DEATH — Roblox Street Crew</title>
+<style>
+  :root {
+    --red: #631a1a;
+    --dark-red: #aa2f2f;
+    --black: #080808;
+    --off-black: #111111;
+    --card: #000000;
+    --border: #2a2a2a;
+    --white: #f5f5f5;
+    --muted: #888;
+    --apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--apple);
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 999; opacity: .4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px;
+    height: 64px;
+    background: rgba(8,8,8,.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: var(--apple);
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: var(--red);
+    text-transform: uppercase;
+  }
+
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-family: var(--apple);
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 100px 20px 60px;
+    position: relative;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 60%, rgba(232,0,13,.12) 0%, transparent 70%),
+      var(--black);
+  }
+
+  .hero-badge {
+    font-family: var(--apple);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    border: 1px solid var(--dark-red);
+    padding: 6px 18px;
+    border-radius: 2px;
+  }
+
+  .hero-logo-mark {
+    font-family: var(--apple);
+    font-size: clamp(80px, 16vw, 180px);
+    font-weight: 900;
+    letter-spacing: -4px;
+    line-height: .9;
+    color: var(--white);
+    text-transform: uppercase;
+    position: relative;
+  }
+
+  .hero-logo-mark span { color: var(--red); }
+
+  .hero-sub {
+    font-family: var(--apple);
+    font-size: clamp(11px, 2vw, 14px);
+    font-weight: 600;
+    letter-spacing: 6px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin: 20px 0 12px;
+  }
+
+  .hero-tagline {
+    font-family: var(--apple);
+    font-size: clamp(28px, 6vw, 64px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 32px;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 480px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+
+  .btn-group { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+
+  .btn {
+    font-family: var(--apple);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 14px 32px;
+    border-radius: 2px;
+    transition: all .2s;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary { background: var(--red); color: #fff; }
+  .btn-primary:hover { background: #7a7a7a; transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--white); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--muted); }
+
+  /* ── TICKER ── */
+  .ticker-wrap {
+    overflow: hidden;
+    background: var(--red);
+    padding: 10px 0;
+    border-top: 1px solid var(--dark-red);
+    border-bottom: 1px solid var(--dark-red);
+  }
+  .ticker-track {
+    display: flex; gap: 0;
+    animation: ticker 28s linear infinite;
+    width: max-content;
+  }
+  .ticker-item {
+    font-family: var(--apple);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: #000000;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 0 28px;
+  }
+  .ticker-item::after { content: '◆'; margin-left: 28px; }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ── SECTION SHELL ── */
+  section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; }
+  .section-label {
+    font-family: var(--apple);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: var(--apple);
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 900;
+    letter-spacing: -1px;
+    color: var(--white);
+    margin-bottom: 48px;
+  }
+
+  /* ── ANNOUNCEMENT ── */
+  .announcement {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--red);
+    padding: 40px 48px;
+    border-radius: 4px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .announcement .tag {
+    font-family: var(--apple);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 5px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .announcement h2 {
+    font-family: var(--apple);
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .announcement p { font-size: 15px; color: var(--muted); line-height: 1.7; }
+  .announcement .time {
+    font-family: var(--apple);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 1px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── ROSTER ── */
+  .roster-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  .member-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px 20px;
+    text-align: center;
+    transition: border-color .2s, transform .2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .member-card:hover { border-color: var(--red); transform: translateY(-4px); }
+  .member-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--red);
+    transform: scaleX(0);
+    transition: transform .3s;
+  }
+  .member-card:hover::before { transform: scaleX(1); }
+
+  .member-emoji { font-size: 32px; margin-bottom: 12px; }
+  .member-rank {
+    font-family: var(--apple);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .member-name {
+    font-family: var(--apple);
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .member-title { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+  .member-quote {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ── GALLERY ── */
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto;
+    gap: 12px;
+  }
+
+  .gallery-item {
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    background: var(--card);
+    border: 1px solid var(--border);
+    transition: transform .3s, border-color .3s;
+  }
+  .gallery-item:hover { transform: scale(1.02); border-color: var(--red); z-index: 2; }
+
+  .gallery-item:nth-child(1) { grid-column: span 7; grid-row: span 2; }
+  .gallery-item:nth-child(2) { grid-column: span 5; }
+  .gallery-item:nth-child(3) { grid-column: span 5; }
+  .gallery-item:nth-child(4) { grid-column: span 4; }
+  .gallery-item:nth-child(5) { grid-column: span 4; }
+  .gallery-item:nth-child(6) { grid-column: span 4; }
+
+  .gallery-inner {
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    padding: 32px;
+    text-align: center;
+  }
+
+  .gallery-item:nth-child(1) .gallery-inner { min-height: 440px; }
+
+  .gallery-placeholder-icon { font-size: 36px; opacity: .5; }
+
+  .gallery-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.8) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity .3s;
+    display: flex; align-items: flex-end;
+    padding: 20px;
+  }
+  .gallery-item:hover .gallery-overlay { opacity: 1; }
+  .gallery-overlay-text {
+    font-family: var(--apple);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+
+  .gallery-label {
+    font-family: var(--apple);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+  }
+  .gallery-desc { font-size: 12px; color: var(--muted); }
+
+  .gallery-upload-note {
+    text-align: center;
+    margin-top: 24px;
+    padding: 16px;
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* ── ABOUT STATS ── */
+  .stats-row {
+    display: flex; gap: 1px;
+    margin-bottom: 60px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .stat {
+    flex: 1;
+    background: var(--card);
+    padding: 32px;
+    text-align: center;
+  }
+  .stat-number {
+    font-family: var(--apple);
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--red);
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+  .stat-label { font-size: 11px; font-weight: 600; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-top: 6px; }
+
+  .about-text { font-size: 16px; color: var(--muted); line-height: 1.9; max-width: 680px; }
+
+  /* ── RULES ── */
+  .rules-list { list-style: none; display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+  .rule {
+    display: flex; align-items: flex-start; gap: 24px;
+    background: var(--card);
+    padding: 28px 32px;
+    transition: background .2s;
+  }
+  .rule:hover { background: #1c1c1c; }
+  .rule-num {
+    font-family: var(--apple);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--red);
+    min-width: 24px;
+    padding-top: 2px;
+  }
+  .rule-content h4 {
+    font-family: var(--apple);
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 4px;
+    letter-spacing: .5px;
+  }
+  .rule-content p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* ── JOIN CTA ── */
+  .join-section {
+    background: linear-gradient(135deg, var(--red) 0%, var(--dark-red) 100%);
+    padding: 80px 40px;
+    text-align: center;
+    border-top: 1px solid var(--dark-red);
+    border-bottom: 1px solid var(--dark-red);
+  }
+  .join-section h2 {
+    font-family: var(--apple);
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+  .join-section p { font-size: 16px; color: rgba(255,255,255,.75); margin-bottom: 32px; }
+  .btn-white { background: #fff; color: var(--red); }
+  .btn-white:hover { background: #eee; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--off-black);
+    border-top: 1px solid var(--border);
+    padding: 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .footer-logo {
+    font-family: var(--apple);
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+  .footer-logo span { color: var(--red); }
+  footer p { font-size: 12px; color: var(--muted); }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero > * { animation: fadeUp .6s ease both; }
+  .hero > *:nth-child(1) { animation-delay: .1s; }
+  .hero > *:nth-child(2) { animation-delay: .2s; }
+  .hero > *:nth-child(3) { animation-delay: .3s; }
+  .hero > *:nth-child(4) { animation-delay: .4s; }
+  .hero > *:nth-child(5) { animation-delay: .5s; }
+  .hero > *:nth-child(6) { animation-delay: .6s; }
+
+  @media (max-width: 768px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    section { padding: 60px 20px; }
+    .stats-row { flex-direction: column; }
+    .gallery-grid { grid-template-columns: 1fr 1fr; }
+    .gallery-item:nth-child(n) { grid-column: span 2; }
+    .gallery-item:nth-child(2), .gallery-item:nth-child(3) { grid-column: span 1; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">E4D</div>
+  <ul class="nav-links">
+    <li><a href="#members">Members</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#rules">Rules</a></li>
+    <li><a href="#join">Join</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">✦ ROBLOX ✦</div>
+  <div class="hero-logo-mark">EVER<span>4</span>DEATH</div>
+  <div class="hero-sub">No Mercy · No Retreat · No Fear</div>
+  <div class="hero-tagline">Stay Real.<br>Ride or Die.</div>
+  <p class="hero-desc">Born from the streets, built for the game. We don't play by rules — we set them. Every member is family.</p>
+  <div class="btn-group">
+    <a href="#members" class="btn btn-primary">View Members</a>
+    <a href="#join" class="btn btn-ghost">Join Us</a>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+    <span class="ticker-item">EVER4DEATH</span>
+  </div>
+</div>
+
+<!-- ANNOUNCEMENT -->
+<section style="max-width:1200px">
+  <div class="section-label">📢 Latest Drop</div>
+  <div class="section-title">Announcement</div>
+  <div class="announcement">
+    <div class="tag">You're Invited</div>
+    <h2>BETA TEST — E4D MAP</h2>
+    <p>Under the soft glow of lights and late night laughter, we're dropping the first beta test of the EVER4DEATH Roblox map. Show up, run the block, make history.</p>
+    <div class="time">⏰ 21 February 2026, 20:00 PM — Until Your Mam's Calling &nbsp;·&nbsp; Cross one of us, cross all of us.</div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ROSTER -->
+<section id="members">
+  <div class="section-label">E4D Gang</div>
+  <div class="section-title">Members</div>
+  <div class="roster-grid">
+    <div class="member-card">
+      <div class="member-emoji">❤️</div>
+      <div class="member-rank">Owner</div>
+      <div class="member-name">CALLEE4D</div>
+      <div class="member-title">Founder & Leader</div>
+      <div class="member-quote">"JUJU"</div>
+    </div>
+    <div class="member-card">
+      <div class="member-emoji">⚡</div>
+      <div class="member-rank">Head Admin</div>
+      <div class="member-name">RELBOYE4D</div>
+      <div class="member-title">Co-Leader</div>
+      <div class="member-quote">"BOY"</div>
+    </div>
+    <div class="member-card">
+      <div class="member-emoji">⚡</div>
+      <div class="member-rank">Head Admin</div>
+      <div class="member-name">PINKIIIE4D</div>
+      <div class="member-title">OG Member</div>
+      <div class="member-quote">"CEPIIII"</div>
+    </div>
+    <div class="member-card">
+      <div class="member-emoji">⚡</div>
+      <div class="member-rank">Head Admin</div>
+      <div class="member-name">BASHUBARE4D</div>
+      <div class="member-title">Co-Leader</div>
+      <div class="member-quote">"BAS"</div>
+    </div>
+    <div class="member-card">
+      <div class="member-emoji">⚡</div>
+      <div class="member-rank">Head Admin</div>
+      <div class="member-name">BEIBYE4D</div>
+      <div class="member-title">OG Member</div>
+      <div class="member-quote">"LIAAA"</div>
+    </div>
+    <div class="member-card">
+      <div class="member-emoji">⚡</div>
+      <div class="member-rank">Videographer</div>
+      <div class="member-name">UrBaeE4D</div>
+      <div class="member-title">OG Member</div>
+      <div class="member-quote">"FANFAN"</div>
+    </div>
+    <div class="member-card">
+      <div class="member-emoji">🎵</div>
+      <div class="member-rank">DJ</div>
+      <div class="member-name">REYYE4D</div>
+      <div class="member-title">E4D DJ</div>
+      <div class="member-quote">"REYY"</div>
+    </div>
+    <div class="member-card">
+      <div class="member-emoji">💥</div>
+      <div class="member-rank">Member</div>
+      <div class="member-name">LIONAE4D</div>
+      <div class="member-title">Street Member</div>
+      <div class="member-quote">"LIONA"</div>
+    </div>
+    <div class="member-card">
+      <div class="member-emoji">💥</div>
+      <div class="member-rank">Member</div>
+      <div class="member-name">LUCENE4D</div>
+      <div class="member-title">Street Member</div>
+      <div class="member-quote">"LUCEN"</div>
+    </div>
+    <div class="member-card">
+      <div class="member-emoji">💥</div>
+      <div class="member-rank">Member</div>
+      <div class="member-name">AYUMIE4D</div>
+      <div class="member-title">Street Member</div>
+      <div class="member-quote">"YUMI"</div>
+    </div>
+    <div class="member-card" style="border-style:dashed; opacity:.5;">
+      <div class="member-emoji">+</div>
+      <div class="member-rank">Open Slot</div>
+      <div class="member-name">YOUR NAME</div>
+      <div class="member-title">Open Slot</div>
+      <div class="member-quote">"You Next?"</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="section-label">📸 Media</div>
+  <div class="section-title">Gallery</div>
+
+  <div class="gallery-grid">
+
+    <div class="gallery-item">
+  <img src="Web1.png" alt="E4D Map" style="width:100%; height:100%; min-height:220px; object-fit:cover; display:block;">
+  <div class="gallery-overlay">
+    <span class="gallery-overlay-text">PHOTO SESSION E4D 🔥</span>
+  </div>
+</div>
+
+     <div class="gallery-item">
+  <img src="Web2.png" alt="E4D Map" style="width:100%; height:100%; min-height:220px; object-fit:cover; display:block;">
+  <div class="gallery-overlay">
+    <span class="gallery-overlay-text">PHOTO SESSION E4D 🔥</span>
+  </div>
+</div>
+
+   <div class="gallery-item">
+  <img src="Web3.png" alt="E4D Map" style="width:100%; height:100%; min-height:220px; object-fit:cover; display:block;">
+  <div class="gallery-overlay">
+    <span class="gallery-overlay-text">MAP INVITATION 🔥</span>
+  </div>
+</div>
+
+ <div class="gallery-item">
+  <img src="Fullmember.png" alt="E4D Map" style="width:100%; height:100%; min-height:220px; object-fit:cover; display:block;">
+  <div class="gallery-overlay">
+    <span class="gallery-overlay-text">FULL MEMBER E4D 🔥</span>
+  </div>
+</div>
+
+ <div class="gallery-item">
+  <img src="Web4.png" alt="E4D Map" style="width:100%; height:100%; min-height:220px; object-fit:cover; display:block;">
+  <div class="gallery-overlay">
+    <span class="gallery-overlay-text">FULL MEMBER E4D 🔥</span>
+  </div>
+</div>
+
+ <div class="gallery-item">
+  <img src="Web5.png" alt="E4D Map" style="width:100%; height:100%; min-height:220px; object-fit:cover; display:block;">
+  <div class="gallery-overlay">
+    <span class="gallery-overlay-text">COUPLE DUO 🔥</span>
+  </div>
+</div>
+
+
+  </div>
+
+</section>
+
+<hr class="divider"/>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">Who We Are</div>
+  <div class="section-title">About Us</div>
+
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-number">E4D</div>
+      <div class="stat-label">Group Tag</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">30+</div>
+      <div class="stat-label">Members</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Loyalty</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">0%</div>
+      <div class="stat-label">DRAMA</div>
+    </div>
+  </div>
+
+  <p class="about-text">EVER4DEATH is a Roblox street crew built on loyalty, grind, and no-nonsense gameplay. We started from nothing and built ourselves into one of the most feared names in the game.<br><br>We represent the streets — staying true, staying sharp, staying dangerous. Whether it's PvP, raids, or just running the block, we do it with style and we do it together.<br><br>Every member is family. Cross one of us, cross all of us.</p>
+</section>
+
+<hr class="divider"/>
+
+<!-- RULES -->
+<section id="rules">
+  <div class="section-label">The Code</div>
+  <div class="section-title">Rules</div>
+  <ul class="rules-list">
+    <li class="rule">
+      <span class="rule-num">01</span>
+      <div class="rule-content">
+        <h4>Stay Loyal.</h4>
+        <p>No snitching, no betrayal, no exceptions. You're crew for life.</p>
+      </div>
+    </li>
+    <li class="rule">
+      <span class="rule-num">02</span>
+      <div class="rule-content">
+        <h4>Respect the Ranks.</h4>
+        <p>Leader and co-leaders call the shots. Fall in line.</p>
+      </div>
+    </li>
+    <li class="rule">
+      <span class="rule-num">03</span>
+      <div class="rule-content">
+        <h4>No Enemies in the Crew.</h4>
+        <p>Leave beef outside. We're all fam in here.</p>
+      </div>
+    </li>
+    <li class="rule">
+      <span class="rule-num">04</span>
+      <div class="rule-content">
+        <h4>Represent.</h4>
+        <p>Always wear the tag [E4D] with pride. Don't embarrass the crew.</p>
+      </div>
+    </li>
+    <li class="rule">
+      <span class="rule-num">05</span>
+      <div class="rule-content">
+        <h4>Grind Every Day.</h4>
+        <p>Active members only. Inactivity gets you dropped.</p>
+      </div>
+    </li>
+    <li class="rule">
+      <span class="rule-num">06</span>
+      <div class="rule-content">
+        <h4>Back Your Brothers.</h4>
+        <p>If crew needs help, you show up. No excuses.</p>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<!-- JOIN CTA -->
+<div class="join-section" id="join">
+  <a href="https://www.roblox.com/users/USER_ID/profile" 
+   class="btn btn-white" 
+   target="_blank">
+   Join on Roblox
+</a>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">EVER<span>4</span>DEATH</div>
+  <p>© 2026 EVER4DEATH — Stay Real. Stay Loyal.</p>
+</footer>
+
+</body>
+</html>
